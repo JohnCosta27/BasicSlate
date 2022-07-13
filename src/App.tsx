@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useState } from "react";
-import { createEditor, Descendant, Transforms } from "slate";
+import { createEditor, Descendant, Editor, Transforms } from "slate";
 import { Slate, Editable, withReact, RenderElementProps } from "slate-react";
 
 // This example is for an Editor with `ReactEditor` and `HistoryEditor`
@@ -8,8 +8,8 @@ import { ReactEditor } from "slate-react";
 import DefaultBlock from "./Elements/DefaultBlock";
 import Paragraph from "./Elements/Paragraph";
 
-type CustomElement = { type: "block"; children: CustomText[] };
-type RedElement = { type: "red"; children: [] };
+type CustomElement = { type: "block"; children: CustomText[] | RedElement[] };
+type RedElement = { type: "red"; children: CustomText[] };
 type CustomText = { type: "text"; text: string; bold?: true };
 
 declare module "slate" {
@@ -25,10 +25,15 @@ const InitialText: CustomText = {
   text: "This is the first paragraph!",
 };
 
+const RedInitial: RedElement = {
+  type: "red",
+  children: [InitialText],
+};
+
 const InitialElements: CustomElement[] = [
   {
     type: "block",
-    children: [InitialText],
+    children: [RedInitial],
   },
 ];
 
@@ -65,10 +70,42 @@ const App: React.FC = () => {
                 ) {
                   Transforms.insertNodes(
                     editor,
-                    { type: "red", children: [] },
+                    { type: "block", children: [] },
                     { at: [editor.children.length] }
                   );
                 }
+              } else if (event.ctrlKey && event.key === "`") {
+                event.preventDefault();
+                const [match] = Editor.nodes(editor, {
+                  match: (n) => n.type === "red",
+                });
+                console.log(match);
+                Transforms.setNodes(
+                  editor,
+                  {
+                    type: match ? "block" : "red",
+                  },
+                  {
+                    match: (n) => Editor.isBlock(editor, n),
+                  }
+                );
+              } else if (event.ctrlKey && event.key === "m") {
+                event.preventDefault();
+                const newFancyNode: CustomElement = {
+                  type: "block",
+                  children: [
+                    {
+                      type: "red",
+                      children: [
+                        {
+                          type: "text",
+                          text: "",
+                        },
+                      ],
+                    },
+                  ],
+                };
+                Editor.insertNode(editor, newFancyNode);
               }
             }}
             renderElement={renderElement}

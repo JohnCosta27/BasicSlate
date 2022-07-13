@@ -11,7 +11,9 @@ const DefaultBlock: React.FC<RenderElementProps> = (props: RenderElementProps) =
         borderRadius: 10,
         backgroundColor: "#dedede",
         marginTop: 10,
-        marginBottom: 10
+        marginBottom: 10,
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
       {props.children}
