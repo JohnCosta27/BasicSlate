@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useState } from "react";
-import { createEditor, Descendant, Editor, Transforms } from "slate";
+import { createEditor, Descendant, Editor, Transforms, Node } from "slate";
 import { Slate, Editable, withReact, RenderElementProps } from "slate-react";
 
 // This example is for an Editor with `ReactEditor` and `HistoryEditor`
@@ -54,7 +54,7 @@ const App: React.FC = () => {
 
   return (
     <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-      <div style={{ width: 700, display: "flex" }}>
+      <div style={{ width: 700, display: "flex", backgroundColor: '#dedede', borderRadius: 20 }}>
         <Slate
           editor={editor}
           value={value}
@@ -64,6 +64,7 @@ const App: React.FC = () => {
             style={{ width: "100%" }}
             onKeyDown={(event: React.KeyboardEvent) => {
               if (event.key === "ArrowDown") {
+                console.log(editor.selection?.focus.path);
                 if (
                   editor.selection?.focus.path[0] ===
                   editor.children.length - 1
@@ -106,6 +107,21 @@ const App: React.FC = () => {
                   ],
                 };
                 Editor.insertNode(editor, newFancyNode);
+              } else if (event.ctrlKey && event.key === "b") {
+                event.preventDefault();
+                Editor.insertText(editor, "This is a snippet");
+              } else if (event.ctrlKey && event.key === "Enter") {
+                event.preventDefault();
+                const selection = editor.selection;
+                if (selection === null) return;
+
+                const parent = Node.parent(editor, selection.focus.path);
+                console.log(parent);
+
+                Editor.insertNode(editor, {
+                  type: "block",
+                  children: [{ type: "text", text: "new ting" }],
+                });
               }
             }}
             renderElement={renderElement}

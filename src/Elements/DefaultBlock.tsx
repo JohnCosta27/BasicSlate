@@ -9,7 +9,6 @@ const DefaultBlock: React.FC<RenderElementProps> = (props: RenderElementProps) =
         width: "100%",
         padding: 8,
         borderRadius: 10,
-        backgroundColor: "#dedede",
         marginTop: 10,
         marginBottom: 10,
         display: 'flex',
